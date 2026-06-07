@@ -13,10 +13,10 @@ import com.example.movieapp.data.model.Movie
 interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveMovies(movies: List<Movie>)
+    suspend fun saveMovies(movies: List<Movie>?)
 
     @Query("SELECT * FROM popular_movies")
-    suspend fun getMovies(): List<Movie>
+    suspend fun getMovies(): List<Movie>?
 
     @Query("DELETE FROM popular_movies")
     suspend fun deleteAllMovies()
