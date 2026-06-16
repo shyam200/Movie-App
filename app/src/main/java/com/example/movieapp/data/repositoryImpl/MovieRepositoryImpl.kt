@@ -26,12 +26,14 @@ class MovieRepositoryImpl(
     }
 
     private suspend fun getMoviesFromDB(): List<Movie> {
-        lateinit var movieList: List<Movie>
+        var movieList: List<Movie> = emptyList()
         try {
             movieList = movieLocalDataSource.getMoviesFromDB() ?: emptyList()
+            Log.e("Repo", "Movies from DB: $movieList")
             if (movieList.isNotEmpty()) {
                 return movieList
             } else {
+                Log.e("Repo", "Movies from DB:-fetching API")
                 movieList = getMoviesFromAPI()
                 movieLocalDataSource.saveMoviesToDB(movieList)
             }
@@ -45,12 +47,16 @@ class MovieRepositoryImpl(
     }
 
     private suspend fun getMoviesFromAPI(): List<Movie> {
-        lateinit var movieList: List<Movie>
+        var movieList: List<Movie> = emptyList()
         try {
             val response = movieRemoteDataSource.getMovies()
             val body = response.body()
+            Log.e("Repo", "Movies from API:-fetching body $body")
             if (body != null) {
                 movieList = body.movies
+                Log.e("Repo", "Movies from API:-fetched movieList $movieList")
+            } else {
+                Log.e("Repo Error", "API Response body is null: ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
             Log.e(
@@ -62,7 +68,7 @@ class MovieRepositoryImpl(
     }
 
     private suspend fun getMoviesFromCache(): List<Movie> {
-       lateinit var movieList : List<Movie>
+        var movieList: List<Movie> = emptyList()
         try {
             movieList = movieCacheDataSource.getMoviesFromCache()
             if (movieList.isNotEmpty()) {
